@@ -1,11 +1,49 @@
 import type { IServiceAccessor } from "@zcode/services";
-import type { AppSettings, UserInfo } from "@zcode/shared";
+import type { AppSettings, AppUsageRange, AppUsageSnapshot, UserInfo } from "@zcode/shared";
 
 const SHELL_USER: UserInfo = {
   id: "shell-user",
   username: "shell",
   displayName: "Shell Preview",
 };
+
+/**
+ * 空用量快照：字段必须齐全（zod schema 同构），否则图表迭代 undefined 会直接崩。
+ */
+function createEmptyAppUsageSnapshot(range: AppUsageRange): AppUsageSnapshot {
+  return {
+    range,
+    generatedAt: Date.now(),
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Shanghai",
+    source: "agent-db",
+    summary: {
+      totalTokens: 0,
+      inputTokens: 0,
+      outputTokens: 0,
+      reasoningTokens: 0,
+      cacheCreationTokens: 0,
+      cacheReadTokens: 0,
+      cacheHitRate: 0,
+      totalSessions: 0,
+      totalTurns: 0,
+      toolCallCount: 0,
+      toolErrorRate: 0,
+      modelErrorRate: 0,
+      avgTimeToFirstTokenMs: null,
+      avgTurnDurationMs: null,
+      activeDays: 0,
+      currentStreakDays: 0,
+      longestSessionMs: 0,
+      longestStreakDays: 0,
+      peakDayTokens: 0,
+      favoriteModel: null,
+    },
+    heatmap: { startDate: null, endDate: null, maxTokens: 0, weeks: [] },
+    dailyModelUsage: [],
+    models: [],
+    tools: [],
+  };
+}
 
 const DEFAULT_SETTINGS: AppSettings = {
   theme: "zai-dark",

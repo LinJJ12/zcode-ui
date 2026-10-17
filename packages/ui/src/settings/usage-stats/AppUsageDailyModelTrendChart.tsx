@@ -100,13 +100,16 @@ function buildDailyModelChartData({
 }): DailyModelChartRow[] {
   const rows = new Map<string, DailyModelChartRow>();
 
-  // App Usage 的 30d 协议结果已经是每日序列，旧 all 分桶残留把
-  // 30 天按周聚合成约 5 个点，导致“最近 30 天”没有连续每日趋势。
-  for (const day of snapshot.dailyModelUsage) {
+  // 后端被裁剪时 dailyModelUsage 可能整个缺失（undefined）而不是空数组，
+  // 直接 for...of 会抛 "is not iterable" 并把整块用量页打进错误边界。
+  for (const day of snapshot.dailyModelUsage ?? []) {
+    if (!day?.date) {
+      continue;
+    }
     const label = formatDay(locale, day.date);
     const row = rows.get(day.date) ?? createEmptyChartRow(label, label, modelKeys);
 
-    for (const model of day.models) {
+    for (const model of day.models ?? []) {
       const key = modelKeyById.get(model.modelId ?? "__unknown__");
       if (key) {
         row[key] = Number(row[key] ?? 0) + model.totalTokens;
