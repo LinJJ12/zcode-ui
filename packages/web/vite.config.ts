@@ -5,6 +5,10 @@ import tailwindcss from "@tailwindcss/vite";
 import { pdfJsCMapsPlugin } from "../ui/vite/pdfJsCMapsPlugin.js";
 
 export default defineConfig({
+  // 相对 base：产物既能挂在站点根（/），也能挂在子目录（/zcode/、GitHub Pages 项目页）。
+  // 默认的绝对 base("/") 会让子路径部署时 /assets/* 全部 404，整页白屏。
+  // 本应用没有 history 路由，相对路径不存在深层路由解析问题。
+  base: "./",
   plugins: [pdfJsCMapsPlugin(), react(), tailwindcss()],
   resolve: {
     alias: {
