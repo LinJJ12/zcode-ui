@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Keyboard, Pencil, Trash2 } from "lucide-react";
 import type { ShortcutCommandEntry, ShortcutCommandId } from "@zcode/shared";
 import { Button } from "@/components/ui/button.js";
@@ -158,9 +159,13 @@ export function ShortcutBindingRow({
       </span>
       <span className="flex min-w-0 flex-col items-start gap-1.5">
         {bindings.map((binding, index) =>
-          isRecording && recording?.mode === "replace" && recording.bindingIndex === index
-            ? renderRecorder()
-            : renderBinding(binding, index),
+          isRecording && recording?.mode === "replace" && recording.bindingIndex === index ? (
+            // renderRecorder 内部根节点不带 key：直接放进数组会让 React 报
+            // "Each child in a list should have a unique key"，这里用带 key 的 Fragment 包一层。
+            <Fragment key={`recorder-${index}`}>{renderRecorder()}</Fragment>
+          ) : (
+            renderBinding(binding, index)
+          ),
         )}
         {/* 未分配命令录第一条：bindings 为空时录制态占满键位单元格 */}
         {isRecording && recording?.mode === "replace" && recording?.bindingIndex === null

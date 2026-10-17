@@ -1042,6 +1042,7 @@ const enUS: Record<string, string> = {
   "browser.permission.siteInfo": "View site information",
   "browser.permission.settings": "Site permissions",
   "browser.permission.close": "Close",
+  "browser.permission.denyThisTime": "Don't allow this time",
   "browser.permission.saved":
     "Permissions updated. Reload the page to apply changes to active resources.",
   "browser.permission.readError": "Could not load permissions.",
