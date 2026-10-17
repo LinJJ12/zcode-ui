@@ -1,6 +1,6 @@
 # NOTICE
 
-本仓库基于 [zai-org/ZCode](https://github.com/zai-org/ZCode) 裁剪，面向**当前工作树**中的 UI 壳预览。非官方衍生，完整产品声明以上游为准。
+本仓库从 [zai-org/ZCode](https://github.com/zai-org/ZCode) 裁出前端相关源码，方便对照参考。完整产品声明以上游为准。
 
 ## 范围
 

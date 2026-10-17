@@ -1,10 +1,26 @@
-# ZCode UI Shell
+# ZCode UI
 
-基于 [zai-org/ZCode](https://github.com/zai-org/ZCode) 裁剪的**前端界面壳**，方便在本地预览共享 UI（侧栏、对话工作区、设置入口、onboarding 等）。
+把 [zai-org/ZCode](https://github.com/zai-org/ZCode) 里和界面相关的源码单独留在这里，方便以后写别的项目时直接对照。
 
-> 非官方社区衍生；与 Z.ai / 上游官方无隶属关系。完整产品请看上游仓库。
+只贴上游仓库链接时，阅读范围经常停在 README 或少数文件。这个仓库把前端相关代码收在本地，组件、样式、状态和页面结构都可以按目录翻。
 
-## 快速开始
+来源是上游的 Apache-2.0 代码，这里只做裁剪，方便查阅。
+
+## 写新项目时先看哪
+
+| 想参考什么 | 从这里开始 |
+| --- | --- |
+| 页面、组件、交互 | `packages/ui/src` |
+| 设计规范 | [DESIGN.md](DESIGN.md)、`docs/design`、`docs/ui` |
+| 对话与会话界面 | `docs/chat`、`packages/ui/src` 里对应的会话组件 |
+| 状态 | `packages/ui/src/store`、`packages/ui/src/hooks` |
+| 类型与协议形状 | `packages/shared` |
+| 服务接口长什么样 | `packages/services`（本仓用 mock 接上，方便看调用方式） |
+| 页面怎么挂起来 | `packages/web/src/shell` |
+
+`packages/web` 是一个能打开的 Vite 入口，用来把 UI 跑起来看布局，不是完整产品。
+
+## 本地看一眼界面
 
 需要 Node.js **24+** 与 pnpm（见 [mise.toml](mise.toml)）。
 
@@ -13,37 +29,20 @@ pnpm install
 pnpm dev
 ```
 
-浏览器打开 Vite 提示的地址（默认 `http://localhost:5173`）。
+浏览器打开 Vite 提示的地址（默认 `http://localhost:5173`）。对话、文件、Git、登录这些需要后端的能力在这里是 mock，只为了把界面撑起来。
 
-壳模式用 `packages/web/src/shell/` 里的 mock platform / mock services 挂载 `@zcode/ui`，**默认不连**真实 Agent、Desktop Host 或业务 API。
-
-## 能做什么 / 不能做什么
-
-| | |
-| --- | --- |
-| 可以 | 预览主界面壳层、设置入口、主题与布局相关 UI |
-| 不可以 | 真实对话、文件、Git、登录支付、Agent 执行等 |
-
-若要完整能力，请使用上游：[zai-org/ZCode](https://github.com/zai-org/ZCode)。
-
-## 仓库里有什么
+## 目录
 
 | 包 | 作用 |
 | --- | --- |
 | `packages/ui` | 主界面组件、hooks、Zustand store |
-| `packages/web` | Vite 壳入口 |
+| `packages/web` | Vite 入口 |
 | `packages/shared` | 协议与类型 |
-| `packages/services` | 服务接口（壳内由 mock 承接） |
-| `packages/rpc` 等 | UI / services 的编译期依赖 |
+| `packages/services` | 服务接口 |
+| `packages/rpc` 等 | 上面这些包编译时还要用到的依赖 |
 
-文档保留 `docs/ui`、`docs/design`、`docs/chat`；设计规范见 [DESIGN.md](DESIGN.md)。
-
-## 配置说明
-
-`.env*` 与 `config/default.json` 里的业务地址、社群链接默认留空，避免误连线上环境。需要联调时，在本地未跟踪的 `.env.local` 里自行填写即可。
+业务地址默认留空，见 `.env.example`。这个仓库的用途是对照源码，不需要连线上服务。
 
 ## 许可
 
-Apache-2.0，见 [LICENSE](LICENSE)。更多说明见 [NOTICE.md](NOTICE.md) 与 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
-
-「ZCode」「Z.ai」仅用于说明代码来源。Git 历史中可能仍有裁剪前的完整树快照；若只想分发当前壳，可自行用 orphan 分支或新仓库推送当前工作树。
+Apache-2.0，见 [LICENSE](LICENSE)。第三方说明见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
