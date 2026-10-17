@@ -31,6 +31,41 @@ pnpm dev
 
 浏览器打开 Vite 提示的地址（默认 `http://localhost:5173`）。对话、文件、Git、登录这些需要后端的能力在这里是 mock，只为了把界面撑起来。
 
+## 构建与部署
+
+```bash
+pnpm build        # 产物在 packages/web/dist
+```
+
+`dist` 是纯静态文件，丢到任意静态托管即可。构建用的是相对路径（`base: "./"`），
+所以既能挂在站点根（`https://example.com/`），也能挂在子目录
+（`https://example.com/zcode/`、GitHub Pages 项目页）。
+
+本地预览构建产物：
+
+```bash
+pnpm --filter @zcode/web exec vite preview
+```
+
+## 界面能做什么、不能做什么
+
+mock 只保证界面渲染，不代表功能可用：
+
+- 模型选择器里的 **Shell Preview** 是占位 provider，用来让输入框显示完整形态。
+  点发送不会有回复——壳里没有 agent 会话协议。
+- 使用统计、任务列表、插件市场、MCP、技能、命令、钩子都是空列表。
+  新建表单能打开、能提交，但数据不会落盘，刷新即恢复。
+- Git 面板、终端、文件树需要真实工作区，这里只有空态。
+- 「打开文件夹」走内置目录浏览器，选中的是虚构路径 `/shell-home`。
+
+## 自查
+
+```bash
+node packages/web/scripts/smoke-shell.mjs http://localhost:5173/
+```
+
+输出一组 markers，`errorBoundary: false` 表示首屏没有落进错误边界。
+
 ## 目录
 
 | 包 | 作用 |
