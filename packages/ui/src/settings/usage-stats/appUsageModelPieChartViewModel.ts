@@ -27,7 +27,7 @@ export function buildAppUsageModelPieChartViewModel({
   intl: UsageIntl;
   snapshot: AppUsageSnapshot;
 }) {
-  const positiveModels = snapshot.models.filter((model) => model.totalTokens > 0);
+  const positiveModels = (snapshot.models ?? []).filter((model) => model.totalTokens > 0);
   const totalModelTokens = positiveModels.reduce((sum, model) => sum + model.totalTokens, 0);
   const shouldMergeOther = positiveModels.length > MAX_APP_USAGE_MODEL_PIE_SLICES;
   const modelSliceLimit = shouldMergeOther

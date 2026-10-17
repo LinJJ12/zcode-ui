@@ -581,7 +581,16 @@ function CodingPlanUsageTrendsSection({
 
 function CodingPlanActivitySection({ snapshot }: { snapshot: CodingPlanUsageSnapshot }) {
   const { intl, locale } = useZCodeIntl();
-  const summary = snapshot.activity.summary;
+  // 壳模式或用量接口缺 activity 时按空活动展示，避免读 heatmap.weeks 把整块设置页打进错误边界。
+  const summary = snapshot.activity?.summary ?? {
+    totalTokens: 0,
+    peakDailyTokens: 0,
+    peakDailyTokensDate: null,
+    totalUsageDurationMs: 0,
+    currentStreakDays: 0,
+    longestStreakDays: 0,
+    favoriteModelName: null,
+  };
   const items = [
     {
       label: intl.formatMessage({ id: "settings.usage.lifetimeTotalTokens" }),
@@ -644,7 +653,7 @@ function CodingPlanActivitySection({ snapshot }: { snapshot: CodingPlanUsageSnap
           </Fragment>
         ))}
       </div>
-      {snapshot.activity.heatmap.weeks.length ? (
+      {(snapshot.activity?.heatmap?.weeks?.length ?? 0) > 0 ? (
         <UsageHeatmap
           locale={locale}
           intl={intl}
@@ -661,38 +670,61 @@ function CodingPlanUsageDetailSection({ snapshot }: { snapshot: CodingPlanUsageS
   const [metric, setMetric] = useState<CodingPlanUsageDetailMetric>("credits");
   const [subject, setSubject] = useState<CodingPlanUsageDetailSubject>("model");
   const [selectedSeriesNames, setSelectedSeriesNames] = useState<string[]>([]);
-  const activeSummary = subject === "model" ? snapshot.detail.model : snapshot.detail.tool;
+  const emptyDetailSummary = {
+    cacheHitRate: null,
+    cacheHitRateTrend: null,
+    totalCredits: 0,
+    totalCreditsTrend: null,
+    averageDailyCredits: 0,
+    averageDailyCreditsTrend: null,
+  };
+  const modelUsage = snapshot.modelUsage ?? {
+    xTime: [],
+    granularity: "day" as const,
+    totalModelCallCount: 0,
+    totalTokensUsage: 0,
+    modelDataList: [],
+    modelSummaryList: [],
+  };
+  const toolUsage = snapshot.toolUsage ?? {
+    xTime: [],
+    granularity: "day" as const,
+    toolDataList: [],
+    toolSummaryList: [],
+  };
+  const activeSummary =
+    (subject === "model" ? snapshot.detail?.model : snapshot.detail?.tool) ?? emptyDetailSummary;
   const hasCreditUsageData = hasCodingPlanCreditUsageData({
     summary: activeSummary,
-    modelDataList: snapshot.modelUsage.modelDataList,
-    toolDataList: snapshot.toolUsage.toolDataList,
+    modelDataList: modelUsage.modelDataList,
+    toolDataList: toolUsage.toolDataList,
   });
   const showDetailSummary = shouldShowCodingPlanUsageDetailSummary({
     summary: activeSummary,
-    modelDataList: subject === "model" ? snapshot.modelUsage.modelDataList : [],
-    toolDataList: subject === "tool" ? snapshot.toolUsage.toolDataList : [],
+    modelDataList: subject === "model" ? modelUsage.modelDataList : [],
+    toolDataList: subject === "tool" ? toolUsage.toolDataList : [],
   });
   const activeChartMeta =
     subject === "model"
       ? {
-          granularity: snapshot.modelUsage.granularity,
-          xTime: snapshot.modelUsage.xTime,
+          granularity: modelUsage.granularity,
+          xTime: modelUsage.xTime,
         }
       : {
-          granularity: snapshot.toolUsage.granularity,
-          xTime: snapshot.toolUsage.xTime,
+          granularity: toolUsage.granularity,
+          xTime: toolUsage.xTime,
         };
   const allSeries = useMemo(() => {
     const series = hasCreditUsageData
       ? buildCodingPlanUsageDetailLineChartSeries({
           metric,
           subject,
-          modelDataList: snapshot.modelUsage.modelDataList,
-          toolDataList: snapshot.toolUsage.toolDataList,
+          modelDataList: modelUsage.modelDataList,
+          toolDataList: toolUsage.toolDataList,
         })
       : subject === "model"
-        ? buildCodingPlanModelLineChartSeries(snapshot.modelUsage.modelDataList)
-        : buildCodingPlanToolLineChartSeries(snapshot.toolUsage.toolDataList);
+        ? buildCodingPlanModelLineChartSeries(modelUsage.modelDataList)
+        : buildCodingPlanToolLineChartSeries(toolUsage.toolDataList);
     return series.map((item, index) => ({
       ...item,
       color:
@@ -975,18 +1007,21 @@ function CodingPlanUsageDetailSummary({
 
 function CodingPlanHealthSection({ snapshot }: { snapshot: CodingPlanUsageSnapshot }) {
   const { intl } = useZCodeIntl();
+  const proMaxDecodeSpeed = snapshot.health?.proMaxDecodeSpeed ?? [];
+  const liteDecodeSpeed = snapshot.health?.liteDecodeSpeed ?? [];
+  const healthXTime = snapshot.health?.xTime ?? [];
   const healthSeries = useMemo(
     () => [
       {
         name: intl.formatMessage({ id: "settings.usage.healthProMaxDecode" }),
-        values: snapshot.health.proMaxDecodeSpeed,
+        values: proMaxDecodeSpeed,
       },
       {
         name: intl.formatMessage({ id: "settings.usage.healthLiteDecode" }),
-        values: snapshot.health.liteDecodeSpeed,
+        values: liteDecodeSpeed,
       },
     ],
-    [snapshot.health.liteDecodeSpeed, snapshot.health.proMaxDecodeSpeed, intl],
+    [liteDecodeSpeed, proMaxDecodeSpeed, intl],
   );
 
   return (
@@ -1002,13 +1037,13 @@ function CodingPlanHealthSection({ snapshot }: { snapshot: CodingPlanUsageSnapsh
       <div className="rounded-xl bg-surface/70 p-3">
         <UsageChartLoadBoundary
           scope="settings.usage.coding-plan-health-chart"
-          resetKeys={[snapshot.sourceProvider.id, snapshot.generatedAt]}
+          resetKeys={[snapshot.sourceProvider?.id, snapshot.generatedAt]}
           loadingDescription={intl.formatMessage({
             id: "settings.usage.codingPlanLoadingDescription",
           })}
         >
           <CodingPlanUsageLineChart
-            xTime={snapshot.health.xTime}
+            xTime={healthXTime}
             granularity="day"
             emptyDescription={intl.formatMessage({
               id: "settings.usage.emptyDescription",

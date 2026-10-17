@@ -82,7 +82,7 @@ export function AppUsagePanel() {
   return (
     <div className="space-y-5">
       <AppUsageLifetimeSummaryStrip snapshot={lifetimeSnapshot} />
-      {lifetimeSnapshot?.heatmap.weeks.length ? (
+      {(lifetimeSnapshot?.heatmap?.weeks?.length ?? 0) > 0 ? (
         <UsageHeatmap locale={locale} intl={intl} weeks={lifetimeSnapshot.heatmap.weeks} />
       ) : null}
       <div className="flex flex-wrap items-center justify-between gap-2">

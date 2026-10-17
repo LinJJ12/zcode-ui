@@ -227,12 +227,18 @@ export function buildStoreItems(input: {
   plugins: ZCodePluginInfo[];
   restorableBuiltins: ZCodeAvailablePluginSummary[];
 }): StorePluginItem[] {
-  const infoById = new Map(input.plugins.map((plugin) => [plugin.id, plugin]));
-  const metaById = new Map(input.installedPlugins.map((item) => [item.id, item]));
-  const marketplaceIds = new Set(input.marketplaces.map((item) => item.id));
+  // overview/list 偶发缺字段时不能让商店整页崩溃；空数组表示“暂无条目”，仍可展示空态。
+  const plugins = input.plugins ?? [];
+  const installedPlugins = input.installedPlugins ?? [];
+  const marketplaces = input.marketplaces ?? [];
+  const availablePlugins = input.availablePlugins ?? [];
+  const restorableBuiltins = input.restorableBuiltins ?? [];
+  const infoById = new Map(plugins.map((plugin) => [plugin.id, plugin]));
+  const metaById = new Map(installedPlugins.map((item) => [item.id, item]));
+  const marketplaceIds = new Set(marketplaces.map((item) => item.id));
   const items = new Map<string, StorePluginItem>();
 
-  for (const summary of input.availablePlugins) {
+  for (const summary of availablePlugins) {
     const info = infoById.get(summary.id);
     items.set(summary.id, {
       id: summary.id,
@@ -248,7 +254,7 @@ export function buildStoreItems(input: {
       ...(metaById.get(summary.id) ? { installedMeta: metaById.get(summary.id) } : {}),
     });
   }
-  for (const summary of input.restorableBuiltins) {
+  for (const summary of restorableBuiltins) {
     const existing = items.get(summary.id);
     if (existing) {
       // 内置卸载态同时存在于完整 Catalog 和 restorable 列表：只有没有实际
@@ -280,7 +286,7 @@ export function buildStoreItems(input: {
     });
   }
   // 运行时发现、但不在任何目录里的插件（inline、被移除市场的遗留安装）也要可见/可搜索。
-  for (const info of input.plugins) {
+  for (const info of plugins) {
     if (items.has(info.id)) continue;
     // 旧插件拆分/下架后，配置仍会生成缺包诊断；它不是可安装目录来源。
     // 保留原 plugins 给设置页诊断，但不凭此生成商店安装入口；有目录/恢复来源的条目已在上面保留。
@@ -315,7 +321,7 @@ export function selectFeaturedItems(
   }
   const featured: StorePluginItem[] = [];
   const seen = new Set<string>();
-  for (const marketplace of marketplaces) {
+  for (const marketplace of marketplaces ?? []) {
     if (!isPublicStoreMarketplaceId(marketplace.id)) continue;
     for (const name of marketplace.featured ?? []) {
       const item = byName.get(name);

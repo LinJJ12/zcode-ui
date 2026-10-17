@@ -350,9 +350,9 @@ export function SkillsSection({
         if (requestId !== latestRequestIdRef.current) {
           return;
         }
-        setSkills(result.skills);
-        setCapability(result.capability);
-        setDiagnostics(result.diagnostics);
+        setSkills(result.skills ?? []);
+        setCapability(result.capability ?? null);
+        setDiagnostics(result.diagnostics ?? []);
         setLoadedSkillTargetKey(requestTargetKey);
         setLoading(false);
       } catch (loadError) {

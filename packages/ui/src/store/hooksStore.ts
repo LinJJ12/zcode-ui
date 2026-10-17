@@ -117,7 +117,7 @@ async function loadCurrentHooks(get: StoreGet, set: StoreSet, hooksService: IHoo
   });
   if (currentWorkspaceKey(get) !== key) return;
   set({
-    hooks: result.hooks,
+    hooks: result.hooks ?? [],
     loadedWorkspaceKey: key,
   });
 }
@@ -201,7 +201,7 @@ export const useHooksStore = create<HooksStoreState>((set, get) => ({
           ...(normalizedIdentity ? { workspaceIdentity: normalizedIdentity } : {}),
         });
         if (currentWorkspaceKey(get) !== key) return;
-        set({ hooks: result.hooks, loadedWorkspaceKey: key, loading: false });
+        set({ hooks: result.hooks ?? [], loadedWorkspaceKey: key, loading: false });
       } catch (error) {
         if (currentWorkspaceKey(get) !== key) return;
         set({ error: errorMessage(error), loading: false });
@@ -232,7 +232,7 @@ export const useHooksStore = create<HooksStoreState>((set, get) => ({
       // 等待期间 store 已切到别的 workspace → 本次结果对当前投影无效，静默丢弃；
       // loading 生命周期归新 workspace 自己的 initialize 所有，这里不得触碰。
       if (currentWorkspaceKey(get) !== key) return;
-      set({ hooks: result.hooks, loadedWorkspaceKey: key, loading: false });
+      set({ hooks: result.hooks ?? [], loadedWorkspaceKey: key, loading: false });
     } catch (error) {
       if (currentWorkspaceKey(get) !== key) return;
       set({ error: errorMessage(error), loading: false });

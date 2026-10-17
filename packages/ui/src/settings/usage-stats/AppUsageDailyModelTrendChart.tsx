@@ -131,7 +131,7 @@ export function buildAppUsageDailyModelChartViewModel({
   locale: string;
   snapshot: AppUsageSnapshot;
 }) {
-  const topModels = snapshot.models.slice(0, 6);
+  const topModels = (snapshot.models ?? []).slice(0, 6);
   const modelKeys = topModels.map((model, index) => ({
     modelId: model.modelId,
     key: `model${index}`,

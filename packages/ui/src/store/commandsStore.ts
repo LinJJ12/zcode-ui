@@ -94,9 +94,9 @@ export const useCommandsStore = create<CommandsStoreState>((set, get) => ({
         });
         if (currentListKey(get) !== key) return;
         set({
-          commands: result.commands,
-          userCommands: result.userCommands,
-          pluginCommands: result.pluginCommands,
+          commands: result.commands ?? [],
+          userCommands: result.userCommands ?? [],
+          pluginCommands: result.pluginCommands ?? [],
           capability: result.capability,
           loadedWorkspacePath: workspacePath ?? null,
           loadedWorkspaceIdentity: normalizedWorkspaceIdentity,
@@ -125,9 +125,9 @@ export const useCommandsStore = create<CommandsStoreState>((set, get) => ({
       });
       if (currentListKey(get) !== key) return;
       set({
-        commands: result.commands,
-        userCommands: result.userCommands,
-        pluginCommands: result.pluginCommands,
+        commands: result.commands ?? [],
+        userCommands: result.userCommands ?? [],
+        pluginCommands: result.pluginCommands ?? [],
         capability: result.capability,
         loadedWorkspacePath: workspacePath,
         loadedWorkspaceIdentity: workspaceIdentity,

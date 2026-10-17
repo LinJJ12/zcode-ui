@@ -163,7 +163,10 @@ export function PluginStorePage({
       restorableBuiltins,
     ],
   );
-  const itemById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
+  const itemById = useMemo(
+    () => new Map((items ?? []).map((item) => [item.id, item])),
+    [items],
+  );
   const detailItem = detailPluginId ? (itemById.get(detailPluginId) ?? null) : null;
   const marketingRequest = useStore(marketingNavigation, (state) => state.request);
   const isMarketingDestinationVisible = useOptionalTabStore((state) => {

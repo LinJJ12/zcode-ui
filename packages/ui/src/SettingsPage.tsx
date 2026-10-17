@@ -862,7 +862,11 @@ export function SettingsPage({
         }
         void localHostServices.systemService
           .listIntegratedTerminalShells()
-          .then(setIntegratedTerminalShellOptions)
+          // 接口被裁剪或返回异常结构时不能把非数组写进 state：
+          // GeneralSectionContent 会直接 .map/.find，一次脏数据就会把整块设置页打进错误边界。
+          .then((options) => {
+            setIntegratedTerminalShellOptions(Array.isArray(options) ? options : []);
+          })
           .catch(() => {
             setIntegratedTerminalShellOptions([]);
           });

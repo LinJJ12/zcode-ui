@@ -1,9 +1,5 @@
 packages:
-  - apps/dev-docs
   - packages/*
-  - apps/zcode-cli
-  - apps/zcode-cli/packages/*
-  - apps/zcode-cli/tools/*
 supportedArchitectures:
   os:
     - current
@@ -19,11 +15,7 @@ supportedArchitectures:
     - glibc
 allowBuilds:
   cpu-features: true
-  edgedriver: true
-  electron: true
-  electron-winstaller: true
   esbuild: true
-  geckodriver: true
   koffi: true
   msw: true
   node-pty: true

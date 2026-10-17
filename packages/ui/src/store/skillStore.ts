@@ -139,8 +139,8 @@ export const useSkillStore = create<SkillStoreState>((set, get) => ({
         normalizedWorkspaceIdentity ?? undefined,
       );
       set({
-        skills: result.skills,
-        capability: result.capability,
+        skills: result.skills ?? [],
+        capability: result.capability ?? null,
         loading: false,
         loadedWorkspacePath: workspacePath,
         loadedWorkspaceIdentity: normalizedWorkspaceIdentity,
@@ -187,8 +187,8 @@ export const useSkillStore = create<SkillStoreState>((set, get) => ({
         workspaceIdentityFromState,
       );
       set({
-        skills: result.skills,
-        capability: result.capability,
+        skills: result.skills ?? [],
+        capability: result.capability ?? null,
         loading: false,
         loadedWorkspacePath: workspacePath,
         loadedWorkspaceIdentity: workspaceIdentityFromState ?? null,

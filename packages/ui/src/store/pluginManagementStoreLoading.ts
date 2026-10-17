@@ -139,14 +139,17 @@ async function runLoadInto(
         ...(params.configScope ? { configScope: params.configScope } : {}),
       }),
     ]);
-    const diagnostics = [...listResult.diagnostics, ...overviewResult.diagnostics];
+    // 壳模式或畸形 RPC 可能省略数组字段；缺省为空集合，避免商店页对 undefined 调 .map 白屏。
+    const listDiagnostics = listResult.diagnostics ?? [];
+    const overviewDiagnostics = overviewResult.diagnostics ?? [];
+    const diagnostics = [...listDiagnostics, ...overviewDiagnostics];
     setIfCurrent({
-      plugins: listResult.plugins,
-      marketplaces: overviewResult.marketplaces,
+      plugins: listResult.plugins ?? [],
+      marketplaces: overviewResult.marketplaces ?? [],
       marketplaceAvailabilityKnown: true,
-      availablePlugins: overviewResult.availablePlugins,
-      installedPlugins: overviewResult.installedPlugins,
-      restorableBuiltins: overviewResult.restorableBuiltins,
+      availablePlugins: overviewResult.availablePlugins ?? [],
+      installedPlugins: overviewResult.installedPlugins ?? [],
+      restorableBuiltins: overviewResult.restorableBuiltins ?? [],
       diagnostics,
       loading: false,
     });
@@ -164,7 +167,7 @@ async function runLoadInto(
         ...(params.configScope ? { configScope: params.configScope } : {}),
       });
       setIfCurrent({
-        plugins: result.plugins,
+        plugins: result.plugins ?? [],
         marketplaces: [],
         // overview 失败时空数组表示“来源状态未知”，而不是“所有来源已删除”。
         // 保留该边界，避免 list fallback 返回的 official/cache 插件被批量误判为孤立安装。
@@ -172,7 +175,7 @@ async function runLoadInto(
         availablePlugins: [],
         installedPlugins: [],
         restorableBuiltins: [],
-        diagnostics: result.diagnostics,
+        diagnostics: result.diagnostics ?? [],
         loading: false,
       });
       return;
