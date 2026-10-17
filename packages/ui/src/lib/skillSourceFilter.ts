@@ -29,5 +29,10 @@ export function filterSkillsForProvider<T extends { path: string; id?: string; s
   skills: T[],
   _legacyProvider: ZCodeProvider,
 ): T[] {
+  // Skill catalog 由 RPC 下发，接口被裁剪时整个字段可能缺失；
+  // 这里兜住空值，避免 `/` 面板一展开就把整个聊天区打进错误边界。
+  if (!Array.isArray(skills)) {
+    return [];
+  }
   return skills.filter(isZcodeSkill);
 }

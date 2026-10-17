@@ -109,6 +109,11 @@ export function buildGroupedTaskViewFromSessions(
   params: BuildGroupedTaskViewParams,
 ): ZCodeGroupedTaskView {
   const { structure } = params;
+  // 分组结构来自后端复合 RPC；接口被裁剪时三个数组可能整体缺失，
+  // 直接 .map 会把整个分组视图打成 "reading 'map'"。缺失按空结构降级。
+  const structureGroups = structure?.groups ?? [];
+  const structureMembers = structure?.members ?? [];
+  const structureTopLevelOrders = structure?.topLevelOrders ?? [];
   const activeTaskByKey = new Map<string, ZCodeTaskListItem>();
   const taskRows = mergeTaskIndexRowsWithSessions({
     taskIndexItems: params.taskIndexItems,
@@ -127,16 +132,16 @@ export function buildGroupedTaskViewFromSessions(
   }
 
   const membersByTaskKey = new Map(
-    structure.members.map((member) => [memberTaskKey(member), member]),
+    structureMembers.map((member) => [memberTaskKey(member), member]),
   );
   const membersByGroupId = new Map<string, ZCodeGroupedTaskViewStructureMember[]>();
-  for (const member of structure.members) {
+  for (const member of structureMembers) {
     const groupMembers = membersByGroupId.get(member.groupId) ?? [];
     groupMembers.push(member);
     membersByGroupId.set(member.groupId, groupMembers);
   }
   const topOrderByMapKey = new Map<string, number>();
-  for (const order of structure.topLevelOrders) {
+  for (const order of structureTopLevelOrders) {
     const mapKey =
       order.type === "group"
         ? `group:${order.groupId}`
@@ -144,7 +149,7 @@ export function buildGroupedTaskViewFromSessions(
     topOrderByMapKey.set(mapKey, order.sortOrder);
   }
 
-  const nodes: ZCodeGroupedTaskViewNode[] = structure.groups.map((group) => {
+  const nodes: ZCodeGroupedTaskViewNode[] = structureGroups.map((group) => {
     const groupTasks = (membersByGroupId.get(group.id) ?? [])
       .map((member) => activeTaskByKey.get(memberTaskKey(member)))
       .filter((task): task is ZCodeTaskListItem => Boolean(task));
@@ -181,7 +186,7 @@ export function buildGroupedTaskViewFromSessions(
       }
       return nodeMapKey(left).localeCompare(nodeMapKey(right));
     });
-  let nextSortOrder = structure.topLevelOrders.reduce(
+  let nextSortOrder = structureTopLevelOrders.reduce(
     (max, order) => Math.max(max, order.sortOrder),
     0,
   );

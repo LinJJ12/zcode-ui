@@ -97,8 +97,9 @@ export function useSkills(options: UseSkillsOptions): ConversationSkillCatalogSt
         setScopedState({
           scope: requestScope,
           value: {
-            skills: result.skills,
-            authority: result.authority,
+            // RPC 结果可能缺 skills 字段（接口裁剪 / 壳模式），写入前统一归一化。
+            skills: Array.isArray(result?.skills) ? result.skills : [],
+            authority: result?.authority ?? null,
             loading: false,
             error: null,
           },

@@ -128,7 +128,10 @@ function scopeParams(scope: TaskListMembershipScope): {
 /** 可选辅助集合读取失败时按空集降级。 */
 async function listOrEmpty<T>(list: () => Promise<T[]>): Promise<T[]> {
   try {
-    return await list();
+    const result = await list();
+    // RPC 裁剪或壳模式下可能 resolve 出非数组（如分页对象），
+    // 直接展开会让 [...pinnedList] 抛 "is not iterable" 并让分组视图整块失败。
+    return Array.isArray(result) ? result : [];
   } catch {
     return [];
   }
@@ -138,7 +141,9 @@ async function listWithAvailability<T>(
   list: () => Promise<T[]>,
 ): Promise<{ items: T[]; available: boolean }> {
   try {
-    return { items: await list(), available: true };
+    const result = await list();
+    // 同上：非数组按“不可用”降级，由上层保留旧视图而不是崩掉整条链路。
+    return Array.isArray(result) ? { items: result, available: true } : { items: [], available: false };
   } catch {
     return { items: [], available: false };
   }

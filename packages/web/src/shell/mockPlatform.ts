@@ -97,5 +97,5 @@ export function createShellPlatform(): IPlatformService {
       methodCache.set(prop, method);
       return method;
     },
-  }) as IPlatformService;
+  }) as unknown as IPlatformService;
 }

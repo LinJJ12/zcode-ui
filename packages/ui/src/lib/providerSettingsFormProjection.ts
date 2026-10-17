@@ -6,13 +6,19 @@ import type { ProviderOrderView } from "@/lib/modelProviderOrdering.js";
 export function projectProviderSettingsViewToFormProviders(
   view: ProviderSettingsView,
 ): ProviderSettingsFormProvider[] {
-  return projectProviderSettingsProviders(view.providers);
+  return projectProviderSettingsProviders(view?.providers ?? []);
 }
 
 function projectProviderSettingsProviders(
-  providers: ProviderSettingsView["providers"],
+  providers: ProviderSettingsView["providers"] | undefined,
 ): ProviderSettingsFormProvider[] {
-  return providers.map((provider) => ({
+  // 后端被裁剪或刷新响应缺字段时，providers 可能整体缺失；
+  // 直接 .map 会让「模型设置」整块进错误边界，这里按空列表降级。
+  // 显式标注回 readonly 数组类型：Array.isArray 会把 readonly 数组收窄成 any[]。
+  const safeProviders: ProviderSettingsView["providers"] = Array.isArray(providers)
+    ? providers
+    : [];
+  return safeProviders.map((provider) => ({
     providerId: provider.providerId,
     providerName: provider.providerName,
     templateId: provider.templateId,
@@ -23,7 +29,7 @@ function projectProviderSettingsProviders(
     issues: provider.issues,
     personalConfig: structuredClone(provider.personalConfig ?? {}),
     config: structuredClone(provider.effectiveConfig),
-    models: provider.models.map((model) => ({
+    models: (provider.models ?? []).map((model) => ({
       kind: model.kind,
       modelId: model.modelId,
       builtin: model.builtin,
@@ -46,7 +52,7 @@ export function resolveProviderSettingsFormProviders(params: {
 }
 
 export function resolvePersonalProviderIds(view: ProviderSettingsView): string[] {
-  return view.providers
+  return (view?.providers ?? [])
     .filter((provider) => provider.effectiveConfig.group === "standard-personal")
     .map((provider) => provider.providerId);
 }

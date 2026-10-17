@@ -79,12 +79,14 @@ export function AppUsagePanel() {
     );
   }
 
+  // 取一次引用：条件里已经判空，但 TS 无法跨 JSX 表达式收窄可选链后的值。
+  const lifetimeWeeks = lifetimeSnapshot?.heatmap?.weeks;
+
   return (
     <div className="space-y-5">
       <AppUsageLifetimeSummaryStrip snapshot={lifetimeSnapshot} />
-      {(lifetimeSnapshot?.heatmap?.weeks?.length ?? 0) > 0 ? (
-        <UsageHeatmap locale={locale} intl={intl} weeks={lifetimeSnapshot.heatmap.weeks} />
-      ) : null}
+      {/* 没有历史用量时也渲染 52 周空网格，避免“Token 活动”整块消失。 */}
+      <UsageHeatmap locale={locale} intl={intl} weeks={lifetimeWeeks ?? []} />
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="text-ui-base font-medium text-foreground">
           {intl.formatMessage({ id: "settings.usage.appUsageRangeTitle" })}
@@ -132,30 +134,28 @@ export function AppUsagePanel() {
 
 export function AppUsageLifetimeSummaryStrip({ snapshot }: { snapshot: AppUsageSnapshot | null }) {
   const { intl, locale } = useZCodeIntl();
+  // 接口被裁剪时 summary 可能整块缺失，逐字段兜底比让整个汇总条进错误边界更划算。
+  const summary = snapshot?.summary;
   const items = [
     {
       label: intl.formatMessage({ id: "settings.usage.lifetimeTotalTokens" }),
-      value: snapshot
-        ? formatSummaryCompactTokenUsage(locale, snapshot.summary.totalTokens)
-        : "--",
+      value: summary ? formatSummaryCompactTokenUsage(locale, summary.totalTokens ?? 0) : "--",
     },
     {
       label: intl.formatMessage({ id: "settings.usage.lifetimePeakTokens" }),
-      value: snapshot
-        ? formatSummaryCompactTokenUsage(locale, snapshot.summary.peakDayTokens)
-        : "--",
+      value: summary ? formatSummaryCompactTokenUsage(locale, summary.peakDayTokens ?? 0) : "--",
     },
     {
       label: intl.formatMessage({ id: "settings.usage.longestSession" }),
-      value: snapshot ? formatAppUsageDuration(snapshot.summary.longestSessionMs, intl) : "--",
+      value: summary ? formatAppUsageDuration(summary.longestSessionMs ?? 0, intl) : "--",
     },
     {
       label: intl.formatMessage({ id: "settings.usage.currentStreak" }),
-      value: snapshot ? formatAppUsageDays(snapshot.summary.currentStreakDays, intl, locale) : "--",
+      value: summary ? formatAppUsageDays(summary.currentStreakDays ?? 0, intl, locale) : "--",
     },
     {
       label: intl.formatMessage({ id: "settings.usage.longestStreak" }),
-      value: snapshot ? formatAppUsageDays(snapshot.summary.longestStreakDays, intl, locale) : "--",
+      value: summary ? formatAppUsageDays(summary.longestStreakDays ?? 0, intl, locale) : "--",
     },
   ];
 

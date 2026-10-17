@@ -130,21 +130,21 @@ function createEmptyHeatmapCell(date: string): AppUsageHeatmapCell {
 }
 
 function buildDisplayHeatmapWeeks(weeks: AppUsageHeatmapWeek[]): AppUsageHeatmapWeek[] {
-  const cells = weeks
-    .flatMap((week) => week.days)
-    .filter((cell): cell is AppUsageHeatmapCell => cell !== null);
+  const cells = (weeks ?? [])
+    .flatMap((week) => week.days ?? [])
+    .filter((cell): cell is AppUsageHeatmapCell => cell !== null && cell !== undefined);
   const datedCells = cells
     .map((cell) => ({ cell, dayIndex: dateKeyToUtcDayIndex(cell.date) }))
     .filter(
       (entry): entry is { cell: AppUsageHeatmapCell; dayIndex: number } => entry.dayIndex !== null,
     );
 
-  if (datedCells.length === 0) {
-    return weeks;
-  }
-
+  // 没有任何用量数据时仍渲染 52 周空网格：整块消失会让“Token 活动”看起来像坏掉了。
+  const endDayIndex =
+    datedCells.length > 0
+      ? Math.max(...datedCells.map(({ dayIndex }) => dayIndex))
+      : Math.floor(Date.now() / DAY_MS);
   const cellsByDate = new Map(datedCells.map(({ cell }) => [cell.date, cell] as const));
-  const endDayIndex = Math.max(...datedCells.map(({ dayIndex }) => dayIndex));
   const endWeekStartDayIndex = endDayIndex - getUtcWeekday(endDayIndex);
   const startDayIndex =
     endWeekStartDayIndex - (HEATMAP_DISPLAY_WEEK_COUNT - 1) * HEATMAP_DAYS_PER_WEEK;
