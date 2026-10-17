@@ -9,8 +9,8 @@ Use this skill before editing code in the ZCode repository. It is a design guide
 
 ## Before writing code
 
-1. Identify intended files and modules from the task, contracts, and existing tests. Run `pnpm architecture:check --changed` for the current baseline; a clean diff does not identify files you have not edited yet.
-2. For cross-module changes, state ownership changes, or an unclear contract, run `pnpm architecture:context <module-id>` (or `node .agents/skills/architecture-governance/scripts/context-package.mjs <module-id>`). For a local change with a known contract, read only the relevant contract, spec, and affected tests; expand when a concrete dependency or evidence gap requires it.
+1. Identify intended files and modules from the task, contracts, and existing tests. A clean diff does not identify files you have not edited yet.
+2. For cross-module changes, state ownership changes, or an unclear contract, read the module's `module.ts` and `contract.ts`, or run `node .agents/skills/architecture-governance/scripts/context-package.mjs <module-id>` when that script is present. For a local change with a known contract, read only the relevant contract, spec, and affected tests; expand when a concrete dependency or evidence gap requires it.
 3. Apply the spec and regression-evidence rules in [AGENTS.md](../../../AGENTS.md). New behavior needs a spec before implementation; restoring already specified behavior needs regression evidence, not a duplicate feature document. Pure refactors update docs only when contracts change.
 4. For changes to mutable state, asynchronous behavior, or module boundaries, make the relevant design decisions before coding:
    - **One owner:** name the single component that owns each piece of mutable state. Other layers read through its contract and send commands; they do not keep a second accepted queue, cache, or derived truth.
@@ -38,9 +38,9 @@ mobile: replayable ─ snapshot + gap repair ┘
 ## During and after editing
 
 6. Keep changes inside the declared module and its allowed layer direction. Add a module dependency or public contract before introducing a cross-module edge.
-7. Run `pnpm architecture:check --changed` after editing. Report new violations separately from baseline violations; include owners and event-order assumptions when affected. Follow the root validation matrix, finish after required checks pass, and expand checks only for new edits, failures, or unresolved risks.
+7. After editing, run `pnpm typecheck` and `pnpm lint`. Include owners and event-order assumptions when the change affects them. Finish after those checks pass, and expand checks only for new edits, failures, or unresolved risks.
 
-The executable policy is `architecture-policy.yaml`; keep its detailed rule definitions there. Check the actual managed-module coverage before claiming the gate verifies a boundary: a passing result does not prove unconfigured modules or runtime semantics are correct. Use `pnpm architecture:baseline:update` only when a reviewed change intentionally changes the accepted legacy baseline. CI never refreshes baseline automatically.
+This checkout does not ship an architecture checker. Module boundaries live in each module's `module.ts` and `contract.ts`.
 
 For a new managed module, provide `module.ts`, `contract.ts`, `contract.example.ts`, `contract.test.ts`, and a short `CONTRACT.md`. Keep runtime and persistence details behind the contract. Prefer typed service calls for one-to-one interactions, commands for state changes, and typed events for broadcast facts.
 

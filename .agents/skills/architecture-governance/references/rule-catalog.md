@@ -14,4 +14,4 @@
 | `missing-module-artifact` | A managed module lacks its manifest or contract fixtures | Add the required module contract, example, test, and CONTRACT.md |
 | `disable-count` | Managed code adds a lint suppression | Fix the underlying violation or add a reviewed expiring exception |
 
-Existing violations are suppressible only through `.architecture-baseline.json`; new violations remain blocking.
+This checkout does not ship `.architecture-baseline.json`. Fix a violation in the owning module instead of adding a suppression.

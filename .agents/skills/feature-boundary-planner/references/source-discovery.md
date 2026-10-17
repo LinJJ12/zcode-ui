@@ -18,7 +18,7 @@ Read the matching node and relationships referencing its ID, then inspect the de
 | Desktop lifecycle     | `packages/desktop/src`                    | renderer/host/main responsibilities, process ownership               |
 | Web client and server | `packages/web/src`, `packages/server/src` | transport, authentication, attachment, client mode                   |
 | Agent runtime         | `apps/zcode-cli/packages`                 | command handler, runtime state, emitted events                       |
-| Module boundaries     | `architecture-policy.yaml`                | declared roots, layers, public entrypoints, dependencies             |
+| Module boundaries     | each module's `module.ts` and `contract.ts` | declared roots, layers, public entrypoints, dependencies           |
 
 Start with bounded searches in the relevant area:
 
