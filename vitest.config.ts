@@ -10,20 +10,7 @@ const processLifecycleTests = [
 ];
 const forkIsolatedTests = [
   ...processLifecycleTests,
-  // electron-builder 下载 NSIS 时把进程 stdio 传给子进程，不能使用 threads 的虚拟 stdio。
-  "packages/desktop/test/windowsInstallerCompile.test.ts",
-  "packages/desktop/test/cdnPreloadScript.test.ts",
-  "packages/desktop/test/desktopRuntimeEnv.test.ts",
-  "packages/desktop/test/e2eDesktopBuildCache.test.ts",
-  "packages/desktop/test/e2eSummarySpecCoverage.test.ts",
-  "packages/desktop/test/migrateStableFeedScript.test.ts",
-  "packages/desktop/test/pluginE2EAdmissionScripts.test.ts",
-  "packages/desktop/test/uploadOssScript.test.ts",
-  // 全量并发时真实心跳与嵌套构建会被调度延迟打穿；单独运行均通过，沿用串行组保留原时限。
-  "packages/desktop/test/webRemoteControlTransport.test.ts",
   "packages/provider-node/test/builtin-provider-build.test.ts",
-  "packages/provider-node/test/builtin-provider-test-config-sync.test.ts",
-  "packages/server/test/remoteDeploy.test.ts",
   // Bugfix: 该集成测试会启动数百个真实 Git 子进程；放在普通 threads 并发组会让
   // macOS 进程启动队列饥饿，表现为 git init 长时间停在 dyld_start。
   "packages/services/test/gitService.test.ts",
@@ -33,36 +20,20 @@ const forkIsolatedTests = [
   "packages/services/test/mcpSyncService.test.ts",
   "packages/services/test/providerRuntimeResolver.test.ts",
   "packages/services/test/runtimeToolResolver.test.ts",
-  // 该集成测试会真实启动 tsx、Supervisor 与多代 Core；放在普通 threads 中时，
-  // 并行 worker 的进程启动压力会让 15 秒 ready barrier 偶发超时。
-  "packages/zcode-server-cli/test/runtimeUpdateIntegration.test.ts",
   // Bugfix: pdfjs-dist legacy build 在 threads worker 内偶发原生崩溃（0xC0000005，
   // 测试自身通过、worker 收尾时崩，会把整场全量跑拦腰截断）。隔离到 fork 池后崩溃
-  // 波及面收敛到本文件，其余测试结果可完整收集；崩溃根因见
-  // docs/windows-test-compatibility.md。
+  // 波及面收敛到本文件，其余测试结果可完整收集。
   "packages/ui/test/pdfJsCMapSupport.test.ts",
 ];
 
 export default defineConfig({
-  // 测试固定注入事件上报端点，使遥测上报链路在单测中可验证；真实构建由 scripts/build-time-config.mjs 决定。
   define: {
     __ZCODE_TELEMETRY_REPORT_ENDPOINT__: JSON.stringify("https://zcode.z.ai/api/v1/event/report"),
   },
   resolve: {
     alias: {
       "@": resolve(__dirname, "packages/ui/src"),
-      "@desktop": resolve(__dirname, "packages/desktop/src"),
       "@web": resolve(__dirname, "packages/web/src"),
-      // 间接 import desktopNetworkTelemetry 等的单测无需真实 ARMS；需 vi.fn 的用例在文件内 vi.mock 覆盖
-      // Bugfix: 具体的 /browser 子路径必须排在包根别名前，否则会被根别名拼成不存在的 stub.ts/browser。
-      "@arms/rum-electron/browser": resolve(
-        __dirname,
-        "packages/desktop/test/mocks/armsRumElectronStub.ts",
-      ),
-      "@arms/rum-electron": resolve(
-        __dirname,
-        "packages/desktop/test/mocks/armsRumElectronStub.ts",
-      ),
     },
   },
   test: {
@@ -96,10 +67,8 @@ export default defineConfig({
             // Gen UI 目录回归位于源码旁，默认入口也必须执行，避免只在手动定向运行时生效。
             "packages/shared/src/node/genUiPaths.test.ts",
             "packages/services/src/gen-ui/**/*.test.ts",
-            "scripts/assert-safe-cua-helper-zip.test.mjs",
-            "scripts/ci/ci-telemetry-keyword-guard.test.mjs",
           ],
-          exclude: ["packages/desktop/test/e2e/**", ...forkIsolatedTests],
+          exclude: [...forkIsolatedTests],
           // Node 24/macOS 的 threads 全量运行可触发 V8 SIGSEGV；诊断时切换进程隔离，测试范围不变。
           pool: process.env.ZCODE_TEST_POOL === "forks" ? "forks" : "threads",
           maxWorkers: process.env.ZCODE_TEST_POOL === "forks" ? 2 : 4,

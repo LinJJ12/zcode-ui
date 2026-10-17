@@ -26,6 +26,7 @@ pnpm dev
 ## 说明
 
 - 设计规范仍见 `DESIGN.md`。
-- 已删除：`apps/zcode-cli`、`packages/desktop`、`packages/server`、远控/分享等后端与宿主运行时。
+- 已删除：`apps/zcode-cli`、`packages/desktop`、`packages/server`、远控/分享等后端与宿主运行时，以及桌面发行脚本、第三方声明、Electron/E2E 文档等壳外材料。
+- 文档仅保留 `docs/ui`、`docs/design`、`docs/chat`；脚本仅保留 `clean` / Node 版本检查 / lint-staged 相关入口。
 - mock 只覆盖首屏与壳层展示；真实对话、文件、Git、Agent 能力不可用。
 - 若要完整产品能力，请回到未裁剪的完整 monorepo。
