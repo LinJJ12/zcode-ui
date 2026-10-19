@@ -692,10 +692,10 @@ describe("useWorkspaceServices 核心路由逻辑覆盖", () => {
 
   describe("远程目标判定", () => {
     it("path-only 调用命中唯一远程 tab 时仍判定为远程目标", () => {
-      const workspacePath =
-        "/mnt/vdb/home/user/project_ebox/multi-omos-platform/core/framework/dds-wrapper";
+      // 使用 RFC5737 文档地址与虚构路径，避免测试夹具像真实内网资产。
+      const workspacePath = "/home/demo/workspace/sample-project/packages/core";
       const workspaceIdentity =
-        "remote:ssh:10.0.0.102:22:user:/mnt/vdb/home/user/project_ebox/multi-omos-platform/core/framework/dds-wrapper";
+        "remote:ssh:192.0.2.10:22:demo:/home/demo/workspace/sample-project/packages/core";
 
       expect(
         resolveWorkspaceServiceIsRemoteTarget({

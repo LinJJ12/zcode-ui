@@ -343,7 +343,7 @@ describe("WorkspaceHeaderActionSection", () => {
       kind: "ssh",
       host: "jumpserver.example.com",
       port: 2222,
-      username: "asset01@root@192.168.100.166",
+      username: "demo@root@192.0.2.10",
       sshConfigAlias: "zcode",
     };
 
@@ -351,7 +351,7 @@ describe("WorkspaceHeaderActionSection", () => {
       withSettingsServices(WorkspaceHeaderActionSection, {
         workspaceAbsPath: "/root/demo-project",
         workspaceIdentity:
-          "remote:ssh:jumpserver.example.com:2222:asset01@root@192.168.100.166:/root/demo-project",
+          "remote:ssh:jumpserver.example.com:2222:demo@root@192.0.2.10:/root/demo-project",
         remoteTarget,
         isTerminalOpen: false,
         isSidePaneOpen: false,
@@ -363,7 +363,7 @@ describe("WorkspaceHeaderActionSection", () => {
     expect(capturedHeaderHelp.editorButtonProps[0]).toMatchObject({
       workspaceAbsPath: "/root/demo-project",
       workspaceIdentity:
-        "remote:ssh:jumpserver.example.com:2222:asset01@root@192.168.100.166:/root/demo-project",
+        "remote:ssh:jumpserver.example.com:2222:demo@root@192.0.2.10:/root/demo-project",
       remoteTarget,
     });
   });

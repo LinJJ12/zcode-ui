@@ -105,7 +105,7 @@ describe("runtimeEnv", () => {
     const sourceEnv = {
       PATH: "/usr/bin:/bin",
       [ZCODE_REMOTE_RUNTIME_NETWORK_AUTHORITY_ENV_KEY]: "1",
-      [ZCODE_REMOTE_HTTP_PROXY_ENV_KEY]: "http://172.21.240.1:7890",
+      [ZCODE_REMOTE_HTTP_PROXY_ENV_KEY]: "http://192.0.2.1:7890",
       [ZCODE_REMOTE_NO_PROXY_ENV_KEY]: "localhost,127.0.0.1",
     };
 

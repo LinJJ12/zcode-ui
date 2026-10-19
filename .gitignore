@@ -24,9 +24,19 @@ coverage/
 .env.local
 .env.*.local
 .env
+# 常见密钥与证书文件名：避免误提交本地联调材料。
+# .env.development / .env.production 为已跟踪的空占位，勿往里填真实值后提交。
+*.pem
+*.p12
+*.pfx
+*.key
+credentials.json
+secrets.json
+*service-account*.json
 .VSCodeCounter
 .idea/
 .zed/
+.workbuddy-ai/
 .cache
 # CI 会跨任务保留这些下载缓存；不应进入 Git 未跟踪源码枚举。
 /.electron-builder-cache/

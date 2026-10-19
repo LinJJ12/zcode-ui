@@ -78,6 +78,8 @@ node packages/web/scripts/smoke-shell.mjs http://localhost:5173/
 
 业务地址默认留空，见 `.env.example`。这个仓库的用途是对照源码，不需要连线上服务。
 
+隐私与遥测边界见 [NOTICE.md](NOTICE.md)。请勿把真实密钥写入已跟踪的 env 占位文件。
+
 ## 许可
 
 Apache-2.0，见 [LICENSE](LICENSE)。第三方说明见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。

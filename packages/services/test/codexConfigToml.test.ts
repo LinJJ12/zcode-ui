@@ -67,7 +67,7 @@ describe("codexConfigToml", () => {
       model_providers: {
         custom: {
           name: "custom",
-          base_url: "http://192.168.100.166:8080/v1",
+          base_url: "http://192.0.2.10:8080/v1",
           wire_api: "responses",
           requires_openai_auth: true,
           query_params: {

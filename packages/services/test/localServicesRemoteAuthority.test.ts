@@ -29,7 +29,7 @@ function writeLegacyZapiConfig(home: string): void {
             kind: "anthropic",
             options: {
               apiKey: "",
-              baseURL: "http://192.168.100.166:8080",
+              baseURL: "http://192.0.2.10:8080",
             },
             models: {
               "gpt-5.4": {
